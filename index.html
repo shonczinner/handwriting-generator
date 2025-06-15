@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Handwriting Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 1em;
+    }
+    textarea, input {
+      font-size: 1em;
+      margin-top: 0.5em;
+    }
+    label {
+      font-weight: bold;
+    }
+    button {
+      font-size: 1em;
+      padding: 0.5em 1em;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="https://shonczinner.github.io">shonczinner.github.io</a>
+  </nav>
+
+  <h1>Handwriting Generator</h1>
+
+  <label for="prompt">Prompt (what to write):</label><br>
+  <textarea id="prompt" rows="2" cols="50" placeholder="Enter text to generate in handwriting..."></textarea><br><br>
+
+  <label>Draw priming strokes (optional):</label><br>
+  <canvas id="inputCanvas" width="1000" height="300"></canvas><br>
+
+  <button id="generateBtn">Generate Handwriting</button>
+
+  <h3>Generated Output:</h3>
+  <canvas id="outputCanvas" width="2000" height="600"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/ort.min.js"></script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
