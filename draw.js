@@ -10,13 +10,11 @@ export function enableCanvasDrawing(canvas, drawDots = false) {
     points.push([lastX, lastY, pen]);
 
     if (drawDots) {
-      // Dot mode: draw small circle
       ctx.beginPath();
       ctx.arc(lastX, lastY, pen === 1 ? 2.5 : 1.5, 0, 2 * Math.PI);
-      ctx.fillStyle = pen === 1 ? "red" : "#000"; // red dot for lift points
+      ctx.fillStyle = pen === 1 ? "red" : "#000";
       ctx.fill();
     } else {
-      // Line mode: draw continuous stroke
       if (pen === 0) {
         ctx.lineTo(lastX, lastY);
         ctx.stroke();
@@ -31,11 +29,11 @@ export function enableCanvasDrawing(canvas, drawDots = false) {
     lastX = e.offsetX;
     lastY = e.offsetY;
     if (!drawDots) ctx.beginPath();
-    recordPoint(0); // Start of stroke
+    recordPoint(0);
 
     samplingInterval = setInterval(() => {
-      recordPoint(0); // Sample mid-stroke
-    }, 15);
+      recordPoint(0);
+    }, 20);
   });
 
   canvas.addEventListener("mousemove", (e) => {
@@ -44,21 +42,24 @@ export function enableCanvasDrawing(canvas, drawDots = false) {
     lastY = e.offsetY;
   });
 
-  canvas.addEventListener("mouseup", () => {
-    if (isDrawing) recordPoint(1); // Pen lifted
+  function stopDrawing() {
+    if (isDrawing) recordPoint(1);
     isDrawing = false;
     clearInterval(samplingInterval);
     samplingInterval = null;
     if (!drawDots) ctx.beginPath();
-  });
+  }
 
-  canvas.addEventListener("mouseleave", () => {
-    if (isDrawing) recordPoint(1); // Treat as lift
-    isDrawing = false;
-    clearInterval(samplingInterval);
-    samplingInterval = null;
-    if (!drawDots) ctx.beginPath();
-  });
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseleave", stopDrawing);
 
-  return () => points;
+  // Return control methods
+  return {
+    getPoints: () => points,
+    clear: () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stopDrawing();
+      points = [];
+    }
+  };
 }

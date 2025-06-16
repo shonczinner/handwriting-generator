@@ -35,17 +35,20 @@ export function denormalizeDeltas(points, meanX, meanY, stdX, stdY) {
 }
 
 // Normalize strokes: center the drawing around (0, 0)
-export function normalizeDeltas(points) {
+export function normalizeDeltas(points, meanX, meanY, stdX, stdY) {
   if (points.length === 0) return [];
 
-  const meanX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
-  const meanY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+  if(!meanX){
+      meanX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+       meanY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
 
-  const varianceX = points.reduce((sum, p) => sum + (p[0] - meanX) ** 2, 0) / points.length;
-  const varianceY = points.reduce((sum, p) => sum + (p[1] - meanY) ** 2, 0) / points.length;
+       const varianceX = points.reduce((sum, p) => sum + (p[0] - meanX) ** 2, 0) / points.length;
+       const varianceY = points.reduce((sum, p) => sum + (p[1] - meanY) ** 2, 0) / points.length;
 
-  const stdX = Math.sqrt(varianceX) || 1; // avoid division by zero
-  const stdY = Math.sqrt(varianceY) || 1;
+       stdX = Math.sqrt(varianceX) || 1; // avoid division by zero
+       stdY = Math.sqrt(varianceY) || 1;
+  }
+ 
 
   return points.map(([x, y, pen]) => [(x - meanX) / stdX, (y - meanY) / stdY, pen]);
 }

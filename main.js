@@ -3,13 +3,13 @@ import { normalizeDeltas, tensorToDeltas, drawStrokes,denormalizeDeltas,
     toDeltaStrokes, fromDeltaStrokes
 } from "./utils.js";
 import { initHandwritingModels, setAscii, primeModel, sampleStep } from "./handwriting.js";
-import { enableCanvasDrawing } from "./draw.js";
+import { enableCanvasDrawing} from "./draw.js";
 
 let hiddenState;
 let strokes = [];
 let deltas = []
 let canvasCtx;
-let getUserStrokeInput;
+let canvasControls;
 const maxSteps = 1000;  // Set max steps here
 let currentStep = 0;
 let normalizationStats = null;  // store mean/std for denormalization
@@ -18,7 +18,7 @@ async function setup() {
   await loadTokenizer();
   await initHandwritingModels();
   await loadNormalizationStats()
-  getUserStrokeInput = enableCanvasDrawing(document.getElementById("inputCanvas"),true);
+  canvasControls = enableCanvasDrawing(document.getElementById("inputCanvas"),true);
   canvasCtx = document.getElementById("outputCanvas").getContext("2d");
 }
 
@@ -27,11 +27,15 @@ async function loadNormalizationStats() {
   normalizationStats = await res.json();
 }
 
+document.getElementById("clearButton").addEventListener("click", () => {
+  canvasControls.clear();
+});
+
 document.getElementById("generateBtn").onclick = async () => {
   strokes = [];
   deltas = []
   const text = document.getElementById("prompt").value;
-  const primingStrokes = getUserStrokeInput();  // Capture strokes from input canvas
+  const primingStrokes = canvasControls.getPoints();  // Capture strokes from input canvas
 
   if (!text ) {
     alert("Please enter text.");
@@ -47,7 +51,16 @@ document.getElementById("generateBtn").onclick = async () => {
 
   }else{
     const primingDeltas = toDeltaStrokes(primingStrokes)
-    const normalizedDeltas = normalizeDeltas(primingDeltas);
+    //const normalizedDeltas = normalizeDeltas(primingDeltas);
+    //const normalizedDeltas = primingDeltas;
+    const normalizedDeltas = normalizeDeltas(
+      primingDeltas,
+      normalizationStats.mu_dx,
+      normalizationStats.mu_dy,
+      normalizationStats.sd_dx,
+      normalizationStats.sd_dy
+    );
+
     hiddenState = await primeModel(normalizedDeltas); // Initialize model hidden state
 
     // Denormalize the priming strokes back for drawing
@@ -109,6 +122,17 @@ async function drawLoop() {
   
   drawStrokes(canvasCtx, strokes);
 
+
+  if (phi) {
+    const phiArr = Array.from(phi);
+    const phiLast = phiArr[phiArr.length - 1];  // phi[:, :, U-1]
+    const phiMax = Math.max(...phiArr);
+
+    if (phiLast === phiMax) {
+      console.log("phi heuristic has ended generation.");
+      return;
+    }
+  }
   currentStep++;
   requestAnimationFrame(drawLoop);
 }
