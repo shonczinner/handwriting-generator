@@ -13,12 +13,13 @@ let canvasControls;
 const maxSteps = 1000;  // Set max steps here
 let currentStep = 0;
 let normalizationStats = null;  // store mean/std for denormalization
+let primed = false;
 
 async function setup() {
   await loadTokenizer();
   await initHandwritingModels();
   await loadNormalizationStats()
-  canvasControls = enableCanvasDrawing(document.getElementById("inputCanvas"),true);
+  canvasControls = enableCanvasDrawing(document.getElementById("inputCanvas"),false);
   canvasCtx = document.getElementById("outputCanvas").getContext("2d");
 }
 
@@ -34,22 +35,25 @@ document.getElementById("clearButton").addEventListener("click", () => {
 document.getElementById("generateBtn").onclick = async () => {
   strokes = [];
   deltas = []
-  const text = document.getElementById("prompt").value;
+  const promptText = document.getElementById("prompt").value;
+  const primerText = document.getElementById("primer").value;
   const primingStrokes = canvasControls.getPoints();  // Capture strokes from input canvas
 
-  if (!text ) {
+  if (!promptText ) {
     alert("Please enter text.");
     return;
   }
 
-  setAscii(text);
 
   if(primingStrokes.length === 0){
-
+    primed = false
+    setAscii(promptText);
     currentStep = 0;  // Reset step count
     requestAnimationFrame(drawLoop);
 
   }else{
+    primed = true
+    setAscii(primerText);
     const primingDeltas = toDeltaStrokes(primingStrokes)
     //const normalizedDeltas = normalizeDeltas(primingDeltas);
     //const normalizedDeltas = primingDeltas;
@@ -63,19 +67,20 @@ document.getElementById("generateBtn").onclick = async () => {
 
     hiddenState = await primeModel(normalizedDeltas); // Initialize model hidden state
 
-    // Denormalize the priming strokes back for drawing
-    deltas = normalizedDeltas
-    const denormalizedDeltas = denormalizeDeltas(
-        normalizedDeltas,
-        normalizationStats.mu_dx,
-        normalizationStats.mu_dy,
-        normalizationStats.sd_dx,
-        normalizationStats.sd_dy
-    );
+    // // Denormalize the priming strokes back for drawing
+    // deltas = normalizedDeltas
+    // const denormalizedDeltas = denormalizeDeltas(
+    //     normalizedDeltas,
+    //     normalizationStats.mu_dx,
+    //     normalizationStats.mu_dy,
+    //     normalizationStats.sd_dx,
+    //     normalizationStats.sd_dy
+    // );
 
 
-    strokes = fromDeltaStrokes(denormalizedDeltas)
+    //strokes = fromDeltaStrokes(denormalizedDeltas)
 
+    setAscii(promptText);
     currentStep = 0;  // Reset step count
     requestAnimationFrame(drawLoop);
   }

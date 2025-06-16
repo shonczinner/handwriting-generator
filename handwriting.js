@@ -75,6 +75,10 @@ export async function primeModel(strokePoints) {
     hidden["w0.1"] = output["w0"];
   }
 
+  const hidden2 = await getInitialHidden();
+  hidden["kappa.1"] = hidden2["kappa.1"];
+  hidden["w0.1"] = hidden2["w0.1"];
+
   return hidden;
 }
 

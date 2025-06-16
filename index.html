@@ -34,12 +34,15 @@
 
   <h1>Handwriting Generator</h1>
 
-  <label for="prompt">Prompt (what to write):</label><br>
-  <textarea id="prompt" rows="2" cols="50" placeholder="Enter text to generate in handwriting..."></textarea><br><br>
+  <label for="primer">Primer text (optional - determines generation style):</label><br>
+  <textarea id="primer" rows="2" cols="50">Write this below</textarea><br><br>
 
-  <label>Draw priming strokes (optional):</label><br>
-  <canvas id="inputCanvas" width="1000" height="300"></canvas><br>
-  <button id="clearButton">Clear</button>
+  <label>Draw priming strokes (optional - determines generation style):</label><br>
+  <canvas id="inputCanvas" width="2000" height="600"></canvas><br>
+  <button id="clearButton">Clear</button><br>
+
+  <label for="prompt">Prompt (what to generate):</label><br>
+  <textarea id="prompt" rows="2" cols="50" placeholder="Enter text to generate in handwriting..."></textarea><br><br>
 
   <button id="generateBtn">Generate Handwriting</button>
 
