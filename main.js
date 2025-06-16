@@ -47,43 +47,28 @@ document.getElementById("generateBtn").onclick = async () => {
 
   if(primingStrokes.length === 0){
     primed = false
-    setAscii(promptText);
-    currentStep = 0;  // Reset step count
-    requestAnimationFrame(drawLoop);
+
 
   }else{
     primed = true
     setAscii(primerText);
     const primingDeltas = toDeltaStrokes(primingStrokes)
-    //const normalizedDeltas = normalizeDeltas(primingDeltas);
     //const normalizedDeltas = primingDeltas;
-    const normalizedDeltas = normalizeDeltas(
-      primingDeltas,
-      normalizationStats.mu_dx,
-      normalizationStats.mu_dy,
-      normalizationStats.sd_dx,
-      normalizationStats.sd_dy
-    );
-
-    hiddenState = await primeModel(normalizedDeltas); // Initialize model hidden state
-
-    // // Denormalize the priming strokes back for drawing
-    // deltas = normalizedDeltas
-    // const denormalizedDeltas = denormalizeDeltas(
-    //     normalizedDeltas,
-    //     normalizationStats.mu_dx,
-    //     normalizationStats.mu_dy,
-    //     normalizationStats.sd_dx,
-    //     normalizationStats.sd_dy
+    const normalizedDeltas = normalizeDeltas(primingDeltas);
+    // const normalizedDeltas = normalizeDeltas(
+    //   primingDeltas,
+    //   normalizationStats.mu_dx,
+    //   normalizationStats.mu_dy,
+    //   normalizationStats.sd_dx,
+    //   normalizationStats.sd_dy
     // );
 
-
-    //strokes = fromDeltaStrokes(denormalizedDeltas)
+    hiddenState = await primeModel(normalizedDeltas); // Initialize model hidden state
+  }
 
     setAscii(promptText);
     currentStep = 0;  // Reset step count
     requestAnimationFrame(drawLoop);
-  }
 };
 
 async function drawLoop() {
@@ -95,7 +80,11 @@ async function drawLoop() {
   let nextDelta, hidden, phi;
 
   if (deltas.length === 0) {
-    ({ nextDelta, hidden, phi } = await sampleStep());
+    if(primed){
+       ({ nextDelta, hidden, phi } = await sampleStep(hidden=hiddenState));
+    }else{
+        ({ nextDelta, hidden, phi } = await sampleStep());
+    }
   } else {
     const lastDelta = deltas[deltas.length - 1];
     ({ nextDelta, hidden, phi } = await sampleStep(lastDelta, hiddenState));

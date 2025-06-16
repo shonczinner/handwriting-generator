@@ -74,7 +74,8 @@ export async function primeModel(strokePoints) {
     hidden["kappa.1"] = output["kappa"];
     hidden["w0.1"] = output["w0"];
   }
-
+  
+  // reset attention hidden states
   const hidden2 = await getInitialHidden();
   hidden["kappa.1"] = hidden2["kappa.1"];
   hidden["w0.1"] = hidden2["w0.1"];
