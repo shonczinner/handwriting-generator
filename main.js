@@ -10,10 +10,14 @@ let strokes = [];
 let deltas = []
 let canvasCtx;
 let canvasControls;
-const maxSteps = 1000;  // Set max steps here
+const maxSteps = 10000;  // Set max steps here
 let currentStep = 0;
 let normalizationStats = null;  // store mean/std for denormalization
 let primed = false;
+
+function getTemperature(){
+  return parseFloat(document.getElementById("temperature").value);
+}
 
 async function setup() {
   await loadTokenizer();
@@ -76,18 +80,18 @@ async function drawLoop() {
     console.log("Reached max steps, stopping generation.");
     return;  // Stop the loop when max steps reached
   }
-
+  const temperature = getTemperature()
   let nextDelta, hidden, phi;
 
   if (deltas.length === 0) {
     if(primed){
-       ({ nextDelta, hidden, phi } = await sampleStep(hidden=hiddenState));
+       ({ nextDelta, hidden, phi } = await sampleStep(undefined,hiddenState,temperature));
     }else{
-        ({ nextDelta, hidden, phi } = await sampleStep());
+        ({ nextDelta, hidden, phi } = await sampleStep(undefined,undefined,temperature));
     }
   } else {
     const lastDelta = deltas[deltas.length - 1];
-    ({ nextDelta, hidden, phi } = await sampleStep(lastDelta, hiddenState));
+    ({ nextDelta, hidden, phi } = await sampleStep(lastDelta, hiddenState,temperature));
   }
 
   const next = tensorToDeltas(nextDelta)[0];

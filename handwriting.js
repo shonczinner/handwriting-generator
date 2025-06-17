@@ -58,6 +58,7 @@ export async function primeModel(strokePoints) {
     const feeds = {
       input: inputTensor,
       ascii: asciiTensor,
+      temperature: new ort.Tensor("float32", new Float32Array([1])),
       ...hidden
     };
 
@@ -84,7 +85,7 @@ export async function primeModel(strokePoints) {
 }
 
 /** Run one sample step given current input and hidden state */
-export async function sampleStep(inputVec, hidden) {
+export async function sampleStep(inputVec, hidden, temperature) {
   if(!hidden){
      hidden = await getInitialHidden();
   }
@@ -96,6 +97,7 @@ export async function sampleStep(inputVec, hidden) {
   const feeds = {
     input: inputTensor,
     ascii: asciiTensor,
+    temperature: new ort.Tensor("float32", new Float32Array([temperature])),
     ...hidden,
   };
 

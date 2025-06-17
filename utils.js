@@ -82,6 +82,8 @@ export function drawStrokes(ctx, strokes) {
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.save();
+
+  ctx.scale(0.3, 0.3); //reduce drawing size
   ctx.translate(ctx.canvas.width / 10, ctx.canvas.height*0.25); // center the drawing
 
   ctx.beginPath();
@@ -105,4 +107,6 @@ export function drawStrokes(ctx, strokes) {
   ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.restore();
+  // Reset current transformation matrix to the identity matrix
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
