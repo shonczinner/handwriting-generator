@@ -83,8 +83,9 @@ export function drawStrokes(ctx, strokes) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.save();
 
+  ctx.translate(ctx.canvas.width / 10, ctx.canvas.height*0.25); // move the drawing more to the center
   ctx.scale(0.3, 0.3); //reduce drawing size
-  ctx.translate(ctx.canvas.width / 10, ctx.canvas.height*0.25); // center the drawing
+
 
   ctx.beginPath();
   let isNewStroke = true;
