@@ -1,7 +1,7 @@
 # handwriting-generator
 Handwriting-generator
 
-WIP
+[Live Link](https://shonczinner.github.io/handwriting-generator/)
 
 To run locally, at the root of the project, run:
 
